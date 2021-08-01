@@ -6,7 +6,7 @@ with open('output.csv', 'a', newline='') as csvfile:
   writer = csv.writer(csvfile)
 
   # 寫入一列資料
-  writer.writerow(['課名', '成績', '排名'])
+  writer.writerow(["學年", "性質", '課名', "學分", '成績', '排名'])
 
   # 寫入另外幾列資料
   
