@@ -1,4 +1,7 @@
 #this is a modal
-print("喔喔  哈")
-a = "喔"
-print(a+" "*2+"哈","喔")
+a = "哈哈"
+b = "一13246864"
+c = [a,b]
+y=sorted(c)
+print(y) 
+print(c)

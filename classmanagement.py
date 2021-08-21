@@ -1,3 +1,4 @@
+#C:\Users\111\Desktop\31634\python_file\env_classmanagement\Scripts
 import csv
 import os
 
@@ -18,6 +19,9 @@ class ClassData:
         self.credit = credit       #學分
         self.score = score         #分數
         self.rank = rank           #排名
+    def __str__(self):
+        return self.name
+        
     def turnlist(self):
         datalist = [self.semester,self.kind,self.name,self.credit,self.score,self.rank]
         return datalist
@@ -30,10 +34,33 @@ class ClassData:
     
 class1 = ClassData("109-1","通識","哈哈",3,"A+","5%")
 
+def sortclass(classlist):
+    new_classlist = [[] for i in range(24)]
+    semesterindex = ["108-1","108-2","109-1","109-2","110-1","110-2","111-1","111-2"]
+    for myclass in classlist:
+        index = semesterindex.index(myclass.semester)
+        if myclass.kind == "必修":
+            new_classlist[index*3+0].append(myclass)
+        elif myclass.kind == "選修":
+            new_classlist[index*3+1].append(myclass)
+        elif myclass.kind == "通識":
+            new_classlist[index*3+2].append(myclass)
+                
+    for i in range(24):
+        new_classlist[i] = sorted(new_classlist[i], key = lambda s: len(s.name))
+    # for i in range(24):
+        # for j in new_classlist[i]:
+            # print(j, end = " ")
+        # print()
+    result = []
+    for i in range(24):
+        result.extend(new_classlist[i])
+    return result
+
 run = 1
 while(run == 1):
     print("1:已修課程; 2:未修課程; 3:輸入資料; 4:計算學分; 5:結束")
-   # mode = input("請輸入模式:")
+    mode = input("請輸入模式:")
     lens = 0
     with open('output.csv', newline='') as csvfile:
         # 讀取 CSV 檔案內容
@@ -44,7 +71,11 @@ while(run == 1):
             classlist.append(theclass)
             if len(rows[row][2]) > lens:
                 lens = len(rows[row][2])
-    mode = "1"
+    classlist = sortclass(classlist)
+
+        
+        
+    # mode = "1"
 
     while(mode == "1"):
         print("已修課程")
@@ -55,21 +86,30 @@ while(run == 1):
         for i in range(len(classlist)):
             classlist[i].printdata(lens)
         mode = "0"
-        run = 0
+
         
     while(mode == "2"):
         print("未修課程")
+        
         mode = "0"
+        
+
+        
     while(mode == "3"):
         print("輸入資料")
         print("學年 性質 課名 學分 成績 排名:")
+        t = ["學年", "性質", "課名", "學分", "成績", "排名"]
         data = input().split(" ")
         with open('output.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
+            writer.writerow(t)
+            for i in classlist:
+                writer.writerow(i.turnlist())
             writer.writerow(data)
             #writer.writerow(class1.turnlist())
         #print(data)
         mode = "0"
+        
     while(mode == "4"):
         print("計算學分")
         
