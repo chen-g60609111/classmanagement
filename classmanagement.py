@@ -45,21 +45,19 @@ def sortclass(classlist):
             new_classlist[index*3+1].append(myclass)
         elif myclass.kind == "通識":
             new_classlist[index*3+2].append(myclass)
-                
+    result = []           
     for i in range(24):
         new_classlist[i] = sorted(new_classlist[i], key = lambda s: len(s.name))
+        result.extend(new_classlist[i])
     # for i in range(24):
         # for j in new_classlist[i]:
             # print(j, end = " ")
         # print()
-    result = []
-    for i in range(24):
-        result.extend(new_classlist[i])
     return result
 
 run = 1
 while(run == 1):
-    print("1:已修課程; 2:未修課程; 3:輸入資料; 4:計算學分; 5:結束")
+    print("1:已修課程; 2:檢視學分; 3:輸入資料; 4:修改; 5:結束")
     mode = input("請輸入模式:")
     lens = 0
     with open('output.csv', newline='') as csvfile:
@@ -73,8 +71,6 @@ while(run == 1):
                 lens = len(rows[row][2])
     classlist = sortclass(classlist)
 
-        
-        
     # mode = "1"
 
     while(mode == "1"):
@@ -85,33 +81,101 @@ while(run == 1):
         print("----------------------------------------")
         for i in range(len(classlist)):
             classlist[i].printdata(lens)
+        print()
         mode = "0"
 
         
     while(mode == "2"):
-        print("未修課程")
-        
+        print("檢視學分")
+        print("必修: 20/30   選修: 15/60   通識: 5/16")
+        print("----------------------------------------")
+        list1 = []
+        list2 = []
+        list3 = []
+        for i in range(len(classlist)):
+            if classlist[i].kind == "必修":
+                list1.append(classlist[i])
+            elif classlist[i].kind == "選修":
+                list2.append(classlist[i])
+            elif classlist[i].kind == "通識":
+                list3.append(classlist[i])
+        list1 = sorted(list1, key = lambda s: (s.name))
+        list2 = sorted(list2, key = lambda s: (s.name))
+        list3 = sorted(list3, key = lambda s: (s.name))
+        print("必修：")
+        for i in list1:
+            print(i.name,i.credit)
+        print()    
+        print("選修：")
+        for i in list2:
+            print(i.name,i.credit)
+        print()
+        print("通識：")
+        for i in list3:
+            print(i.name,i.credit)
+        print()
         mode = "0"
-        
-
         
     while(mode == "3"):
         print("輸入資料")
         print("學年 性質 課名 學分 成績 排名:")
         t = ["學年", "性質", "課名", "學分", "成績", "排名"]
         data = input().split(" ")
+        if data[0] == "":
+            mode = "0"
+            break        
+        if len(data) != 6:
+            print("輸入錯誤")            
+            print()
+            continue       
+        with open('output.csv', 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(data)
+        print()
+        
+    while(mode == "4"):
+        print("修改")
+        print("編號", end = " ")
+        print("%3s %2s" %(rows[0][0],rows[0][1]), end = " ")
+        print("  "*(lens-len(rows[0][2]))+rows[0][2], end = " ")
+        print("%s %s %s" %(rows[0][3],rows[0][4],rows[0][5]))
+        print("----------------------------------------")
+        for i in range(len(classlist)):
+            print("%4d" %(i+1), end = " ")
+            classlist[i].printdata(lens)
+        target = input("修改項目:")
+        if target == "" or type(target)!="int":
+            mode = "0"
+            break
+        elif int(target) <= len(classlist):
+            target = int(target)
+        else:
+            print("無此項目")
+            print()
+            continue
+        print("修改前:",end = "")
+        print(classlist[target-1].semester,classlist[target-1].kind,classlist[target-1].name,classlist[target-1].credit,classlist[target-1].score,classlist[target-1].rank)
+        revise = input("修改後:").split(" ")
+        if len(revise) != 6:
+            mode = "0"
+            break
+        revise_class = ClassData(revise[0],revise[1],revise[2],revise[3],revise[4],revise[5])
+        classlist[target-1] = revise_class
+        print()
+        t = ["學年", "性質", "課名", "學分", "成績", "排名"]
         with open('output.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(t)
             for i in classlist:
                 writer.writerow(i.turnlist())
-            writer.writerow(data)
-            #writer.writerow(class1.turnlist())
-        #print(data)
-        mode = "0"
-        
-    while(mode == "4"):
-        print("計算學分")
+
+        # print("清除資料")
+        # check = input("yes/no:")
+        # t = ["學年", "性質", "課名", "學分", "成績", "排名"]
+        # if check == "yes":
+            # with open('output.csv', 'w', newline='') as csvfile:
+                # writer = csv.writer(csvfile)
+                # writer.writerow(t)
         
         mode = "0"
     while(mode == "5"):
